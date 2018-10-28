@@ -1,11 +1,7 @@
-# MahjongKit
+# JapaneseRiichiMahjongKit
 |Author|Jianyang Tang (Thomas)|
 |---|---
 |E-mail|jian4yang2.tang1@gmail.com
-
-****
-
-## Riichi Mahjong Kit Contents: 
 
 # Contents
 * [1. Game log crawler: GameLogCrawler](#crawl)
@@ -24,7 +20,6 @@
 | [db_get_logs_where_players_lv_gr(self, gr_lv)](#dblogs) | Return a generator of game logs, in which player with level higher than gr_lv are involved. |
 | [prt_log_format(log)](#printlog) | Print the game log in a user friendly format |
 
-***
 ### <a name="showtable"></a>db_show_tables()
 ```python
 glc = GameLogCrawler()
