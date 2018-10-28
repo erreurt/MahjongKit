@@ -14,7 +14,7 @@
 
 *** 
 
-# <a name="rules"></a>1. Game log crawler: GameLogCrawler
+# <a name="crawl"></a>1. Game log crawler: GameLogCrawler
 | function  | Description |
 | --------- | ----------- |
 | [db_show_tables()](#showtable) | Display the structure of the database. |
@@ -195,4 +195,100 @@ name: ['おかもと', 'KOTA**', '爆弾五郎２', 'trail']
 
 ```
 
-# TO BE CONTINUED
+# <a name="pre"></a>2. Game log preprocessor: PreProsessing
+
+| function  | Description |
+| --------- | ----------- |
+| [process_one_log(log)](#onelog) | Preprocess a whole log, which contains several game rounds. Return a dict with key as round number and value as a list of state-action pair object |
+
+### <a name="onelog"></a>process_one_log(log)
+This function returns a dict with key as the round number and value as a list of state-action pair objects. A state-action pair object is an instance of class ***PlayerState***. This class wraps all the visible states of the Mahjong table and opponents. 
+```python
+glc = GameLogCrawler()
+log_generator = glc.db_get_logs_where_players_lv_gr(19)
+one_log = log_generator.__next__()
+processed = PreProcessing.process_one_log(one_log)
+for round_num, state_action_pair_objs in processed.items():
+    print("Round {}:".format(round_num))
+    for sa_pair in state_action_pair_objs:
+        print(sa_pair)
+```
+```console
+Round 1:
+    Player: おかもと, 天鳳, 25000
+    State:
+        Hand:[1, 2, 2, 6, 10, 10, 15, 21, 24, 28, 31, 32, 33, 19]
+        Discard: []
+        Status: Reach False, Player wind 27, Round wind 27, Red fives [], Bonus tiles [33]
+        Revealed: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    Last action: None
+    Action: {'type': 'drop', 'tile': 28}
+    Result: None
+
+    Player: KOTA**, 八段, 25000
+    State:
+        Hand:[4, 7, 8, 14, 16, 18, 18, 19, 20, 20, 22, 25, 25, 33]
+        Discard: []
+        Status: Reach False, Player wind 28, Round wind 27, Red fives [], Bonus tiles [33]
+        Revealed: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    Last action: None
+    Action: {'type': 'drop', 'tile': 8}
+    Result: None
+
+    Player: 爆弾五郎２, 七段, 25000
+    State:
+        Hand:[9, 11, 13, 13, 14, 15, 16, 17, 19, 23, 25, 28, 30, 15]
+        Discard: []
+        Status: Reach False, Player wind 29, Round wind 27, Red fives [], Bonus tiles [33]
+        Revealed: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    Last action: None
+    Action: {'type': 'drop', 'tile': 19}
+    Result: None
+
+    Player: trail, 七段, 25000
+    State:
+        Hand:[1, 4, 6, 8, 11, 11, 13, 16, 17, 18, 23, 27, 29, 7]
+        Discard: []
+        Status: Reach False, Player wind 30, Round wind 27, Red fives [], Bonus tiles [33]
+        Revealed: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    Last action: None
+    Action: {'type': 'drop', 'tile': 29}
+    Result: None
+    ...
+Round 2:
+    ...
+```
+
+# <a name="deter"></a>3. Deterministic algorithms: WinWaitCal, Partition
+
+## Partition
+
+| function  | Description |
+| --------- | ----------- |
+| [partition(tiles34)](#parti) | Partition hand tiles into melds, pairs and single tiles |
+| [shantin_normal(tiles34, called_melds)](#nmst) | Calculate the shantin of normal form |
+
+### <a name="parti"></a>partition(tiles34)
+```python
+partitions = Partition.partition([0, 0, 1, 2, 3, 14, 14, 14, 15, 27, 27, 28, 28])
+for p in partitions:
+    print("{} {}".format(p, Tile.t34_to_grf(p)))
+```
+```console
+[[0, 0], [1, 2, 3], [14, 14, 14], [15], [27, 27], [28, 28]] 🀇🀇 🀈🀉🀊 🀞🀞🀞 🀟 🀀🀀 🀁🀁 
+[[0, 0], [1, 2, 3], [14, 14], [14, 15], [27, 27], [28, 28]] 🀇🀇 🀈🀉🀊 🀞🀞 🀞🀟 🀀🀀 🀁🀁 
+```
+### <a name="nmst"></a>shantin_normal(tiles34, called_melds)
+```python
+hand_tiles = [0, 0, 1, 2, 3, 14, 14, 14, 15, 27, 27, 28, 28]
+called_melds = []
+nm_st = Partition.shantin_normal(hand_tiles, called_melds)
+print("{} has {} shantin(normal)".format(Tile.t34_to_grf(hand_tiles), nm_st))
+```
+```console
+🀇🀇🀈🀉🀊🀞🀞🀞🀟🀀🀀🀁🀁 has 1 shantin(normal)
+```
+
+***
+
+# To be continued
