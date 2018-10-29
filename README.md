@@ -15,7 +15,7 @@
 | --------- | ----------- |
 | [db_show_tables()](#showtable) | Display the structure of the database. |
 | [batch_crawl_refids(gr_level, ite=5)](#batchrefids) | Crawl game log referral ids of players who havn't been explored yet. The crawled ids will be then inserted into the TABLE refids. |
-| [batch_crawl_levels(self, ite=5)](#batchlevels) | Crawl levels for players who havn't have the value for level and pt in the database. The crawled information will be updated in the TABLE players.|
+| [batch_crawl_levels(self, ite=5)](#batchlevels) | Crawl levels for players who havn't had the value for level and pt in the database. The crawled information will be updated in the TABLE players.|
 | [batch_crawl_logs(self, gr_lv, ite=10)](#batchlogs) | Crawl game logs, in which players with level higher than gr_lv are involved. The game log will be inserted into TABLE log as text. |
 | [db_get_logs_where_players_lv_gr(self, gr_lv)](#dblogs) | Return a generator of game logs, in which player with level higher than gr_lv are involved. |
 | [prt_log_format(log)](#printlog) | Print the game log in a user friendly format |
